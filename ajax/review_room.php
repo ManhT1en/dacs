@@ -1,4 +1,4 @@
-<?php 
+S<?php 
 // ==========================================
 // FILE: ajax/review_room.php
 // MỤC ĐÍCH: Gửi đánh giá và nhận xét cho phòng đã đặt

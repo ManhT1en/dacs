@@ -1,13 +1,22 @@
 <?php 
+// ==========================================
+// FILE: admin/ajax/refund_bookings.php
+// MỤC ĐÍCH: Quản lý hoàn tiền cho bookings đã hủy
+// ==========================================
 
   require('../inc/db_config.php');
   require('../inc/essentials.php');
   adminLogin();
 
+  // ==========================================
+  // CHỨC NĂNG: LẤY DANH SÁCH BOOKINGS CHờHOÀN TIỀN
+  // Hiển thị các bookings đã hủy nhưng chưa refund
+  // ==========================================
   if(isset($_POST['get_bookings']))
   {
     $frm_data = filteration($_POST);
 
+    // Truy vấn bookings cancelled và refund=0 (chưa hoàn tiền)
     $query = "SELECT bo.*, bd.* FROM `booking_order` bo
       INNER JOIN `booking_details` bd ON bo.booking_id = bd.booking_id
       WHERE (bo.order_id LIKE ? OR bd.phonenum LIKE ? OR bd.user_name LIKE ?) 
@@ -61,15 +70,20 @@
     echo $table_data;
   }
 
+  // ==========================================
+  // CHỨC NĂNG: XẬC NHẬN HOÀN TIỀN
+  // Cập nhật refund=1 cho booking đã hủy
+  // ==========================================
   if(isset($_POST['refund_booking']))
   {
     $frm_data = filteration($_POST);
 
+    // Cập nhật refund=1 (đã hoàn tiền)
     $query = "UPDATE `booking_order` SET `refund`=? WHERE `booking_id`=?";
     $values = [1,$frm_data['booking_id']];
     $res = update($query,$values,'ii');
 
-    echo $res;
+    echo $res; // Trả về 1 nếu thành công
   }
 
 ?>

@@ -77,6 +77,11 @@
               // $btn="<a href='generate_pdf.php?gen_pdf&id=$data[booking_id]' class='btn btn-dark btn-sm shadow-none'>Download PDF</a>";
             }
           }
+          else if($data['booking_status']=='pending')
+          {
+            $status_bg = "bg-warning";
+            $btn="<button onclick='cancel_booking($data[booking_id])' type='button' class='btn btn-danger btn-sm shadow-none'>Cancel</button>";
+          }
           else
           {
             $status_bg = "bg-warning";
@@ -183,7 +188,7 @@
           }
         }
 
-        xhr.send('cancel_booking&id='+id);
+        xhr.send('cancel_booking=&id='+id);
       }
     }
 

@@ -1,12 +1,23 @@
 <?php
+// ==========================================
+// FILE: admin/ajax/new_bookings.php
+// MỤC ĐÍCH: Quản lý đơn đặt phòng mới
+// BAO GỒM: Assign room, thêm dịch vụ, hủy booking
+// ==========================================
   require('../inc/essentials.php');
   require('../inc/db_config.php');
   adminLogin();
 
+  // ==========================================
+  // CHỨC NĂNG: LẤY DANH SÁCH BOOKINGS MỚI
+  // Hiển thị các bookings pending hoặc chưa checkin
+  // ==========================================
   if(isset($_POST['get_bookings']))
   {
+    // Lọc dữ liệu đầu vào
     $frm_data = filteration($_POST);
 
+    // Truy vấn bookings mới (pending hoặc booked nhưng chưa arrival)
     $query = "SELECT bo.*, bd.* FROM `booking_order` bo
       INNER JOIN `booking_details` bd ON bo.booking_id = bd.booking_id
       WHERE (bo.order_id LIKE ? OR bd.phonenum LIKE ? OR bd.user_name LIKE ?) 
@@ -22,18 +33,22 @@
       exit;
     }
 
+    // Duyệt qua từng booking và hiển thị
     while($data = mysqli_fetch_assoc($res))
     {
+      // Format ngày tháng
       $date = date("d-m-Y",strtotime($data['datentime']));
       $checkin = date("d-m-Y",strtotime($data['check_in']));
       $checkout = date("d-m-Y",strtotime($data['check_out']));
 
+      // Màu badge theo trạng thái
       if($data['booking_status'] == 'pending') {
-        $status_bg = 'bg-warning';
+        $status_bg = 'bg-warning'; // Vàng: Chờ xử lý
       } else {
-        $status_bg = 'bg-success';
+        $status_bg = 'bg-success'; // Xanh: Đã đặt
       }
 
+      // Lấy danh sách dịch vụ đã đặt
       $services_q = mysqli_query($con, "SELECT s.name, bs.quantity FROM `booking_services` bs INNER JOIN `services` s ON bs.service_id = s.id WHERE bs.booking_id = {$data['booking_id']}");
       $services_data = "";
       if(mysqli_num_rows($services_q) > 0){

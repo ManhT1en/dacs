@@ -59,7 +59,7 @@
 
   <?php require('inc/scripts.php'); ?>
 
-  <script src="scripts/users.js"></script>
+  <script src="scripts/users.js?v=<?php echo time(); ?>"></script>
 
 </body>
 </html>

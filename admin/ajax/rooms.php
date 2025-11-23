@@ -1,17 +1,28 @@
 <?php 
+// ==========================================
+// FILE: admin/ajax/rooms.php
+// MỤC ĐÍCH: Quản lý phòng (CRUD)
+// BAO GỒM: Thêm, sửa, xóa phòng, quản lý ảnh phòng
+// ==========================================
 
   require('../inc/db_config.php');
   require('../inc/essentials.php');
   adminLogin();
 
+  // ==========================================
+  // CHỨC NĂNG: THÊM PHÒNG MỚI
+  // Thêm phòng với features và facilities
+  // ==========================================
   if(isset($_POST['add_room']))
   {
+    // Giải mã danh sách features và facilities từ JSON
     $features = filteration(json_decode($_POST['features']));
     $facilities = filteration(json_decode($_POST['facilities']));
 
     $frm_data = filteration($_POST);
     $flag = 0;
 
+    // Insert thông tin cơ bản của phòng
     $q1 = "INSERT INTO `rooms` (`name`, `area`, `price`, `quantity`, `adult`, `children`, `description`) VALUES (?,?,?,?,?,?,?)";
     $values = [$frm_data['name'],$frm_data['area'],$frm_data['price'],$frm_data['quantity'],$frm_data['adult'],$frm_data['children'],$frm_data['desc']];
 
@@ -19,8 +30,10 @@
       $flag = 1;
     }
     
+    // Lấy ID của phòng vừa thêm
     $room_id = mysqli_insert_id($con);
 
+    // Insert facilities cho phòng (tiện ích: wifi, TV, etc.)
     $q2 = "INSERT INTO `room_facilities`(`room_id`, `facilities_id`) VALUES (?,?)";
     if($stmt = mysqli_prepare($con,$q2))
     {
@@ -35,7 +48,7 @@
       die('query cannot be prepared - insert');
     }
 
-    
+    // Insert features cho phòng (không gian: view biển, balcony, etc.)
     $q3 = "INSERT INTO `room_features`(`room_id`, `features_id`) VALUES (?,?)";
     if($stmt = mysqli_prepare($con,$q3))
     {

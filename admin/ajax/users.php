@@ -25,8 +25,7 @@
 
       if($row['is_verified']){
         $verified = "<span class='badge bg-success'><i class='bi bi-check-lg'></i></span>";
-        $del_btn = ""; 
-        $verify_btn = "";
+        $verify_btn = ""; // Ẩn nút verify cho user đã xác thực
       }
 
       $status = "<button onclick='toggle_status($row[id],0)' class='btn btn-dark btn-sm shadow-none'>
@@ -100,11 +99,11 @@
     $frm_data = filteration($_POST);
     $user_id = $frm_data['user_id'];
 
-    // Kiểm tra user có được xác thực chưa
-    $user_check = select("SELECT * FROM `user_cred` WHERE `id`=? AND `is_verified`=?", [$user_id, 0], 'ii');
+    // Kiểm tra user có tồn tại không
+    $user_check = select("SELECT * FROM `user_cred` WHERE `id`=?", [$user_id], 'i');
     
     if(mysqli_num_rows($user_check) == 0){
-      echo 'verified_user'; // User đã xác thực hoặc không tồn tại
+      echo 'user_not_found'; // User không tồn tại
       exit;
     }
 
@@ -183,8 +182,7 @@
 
       if($row['is_verified']){
         $verified = "<span class='badge bg-success'><i class='bi bi-check-lg'></i></span>";
-        $del_btn = ""; 
-        $verify_btn = "";
+        $verify_btn = ""; // Ẩn nút verify cho user đã xác thực
       }
 
       $status = "<button onclick='toggle_status($row[id],0)' class='btn btn-dark btn-sm shadow-none'>

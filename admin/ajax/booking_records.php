@@ -1,18 +1,33 @@
 <?php 
+// ==========================================
+// FILE: admin/ajax/booking_records.php
+// MỤC ĐÍCH: Quản lý lịch sử đặt phòng đã hoàn tất
+// BAO GỒM: Bookings đã checkin, đã hủy + hoàn tiền, thanh toán thất bại
+// ==========================================
 
   require('../inc/db_config.php');
   require('../inc/essentials.php');
   date_default_timezone_set("Asia/Kolkata");
   adminLogin();
 
+  // ==========================================
+  // CHỨC NĂNG: LẤY LỊCH SỬ ĐẶT PHÒNG
+  // Hiển thị bookings đã hoàn tất với phân trang
+  // ==========================================
   if(isset($_POST['get_bookings']))
   {
+    // Lọc dữ liệu đầu vào
     $frm_data = filteration($_POST);
 
+    // Cài đặt phân trang (2 records mỗi trang)
     $limit = 2;
     $page = $frm_data['page'];
     $start = ($page-1) * $limit;
 
+    // Truy vấn bookings đã hoàn tất:
+    // - booked + arrival=1 (đã checkin)
+    // - cancelled + refund=1 (đã hủy và hoàn tiền)
+    // - payment failed (thanh toán thất bại)
     $query = "SELECT bo.*, bd.* FROM `booking_order` bo
       INNER JOIN `booking_details` bd ON bo.booking_id = bd.booking_id
       WHERE ((bo.booking_status='booked' AND bo.arrival=1) 
@@ -21,8 +36,10 @@
       AND (bo.order_id LIKE ? OR bd.phonenum LIKE ? OR bd.user_name LIKE ?) 
       ORDER BY bo.booking_id DESC";
 
+    // Đếm tổng số records để tính phân trang
     $res = select($query,["%$frm_data[search]%","%$frm_data[search]%","%$frm_data[search]%"],'sss');
     
+    // Lấy records cho trang hiện tại
     $limit_query = $query ." LIMIT $start,$limit";
     $limit_res = select($limit_query,["%$frm_data[search]%","%$frm_data[search]%","%$frm_data[search]%"],'sss');
 
@@ -37,20 +54,23 @@
     $i=$start+1;
     $table_data = "";
 
+    // Duyệt qua từng booking và tạo HTML table row
     while($data = mysqli_fetch_assoc($limit_res))
     {
+      // Format ngày tháng
       $date = date("d-m-Y",strtotime($data['datentime']));
       $checkin = date("d-m-Y",strtotime($data['check_in']));
       $checkout = date("d-m-Y",strtotime($data['check_out']));
 
+      // Xác định màu badge theo trạng thái
       if($data['booking_status']=='booked'){
-        $status_bg = 'bg-success';
+        $status_bg = 'bg-success'; // Xanh lá: Đang ở
       }
       else if($data['booking_status']=='cancelled'){
-        $status_bg = 'bg-danger';
+        $status_bg = 'bg-danger'; // Đỏ: Đã hủy
       }
       else{
-        $status_bg = 'bg-warning text-dark';
+        $status_bg = 'bg-warning text-dark'; // Vàng: Thanh toán thất bại
       }
       
       $table_data .="
