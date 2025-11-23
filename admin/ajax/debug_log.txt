@@ -1,0 +1,11 @@
+--- New Request: 2025-10-02 07:33:46 ---
+Received POST data: Array
+(
+    [booking_id] => 23
+    [services] => [{"id":"1","quantity":"1"}]
+    [add_service_to_booking_form] => 
+)
+
+Decoded services: 
+No services selected or invalid format. Responding without DB action.
+
